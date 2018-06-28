@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <title>DM's Whiteboard</title>
+    <link href="style.css" type="text/css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32" />
+
+  </head>
+  <body>
+    <div class="jumbotron jumbotron-fluid rounded">
+      <div class="container">
+        <h1 class="display-4">
+          <!--<img id='logo' src="images/logo_1.png" class="img-responsive" alt="Logo">-->
+          DM's Whiteboard
+        </h1>
+        <p class="lead">Hopefully better than just writing shit down.</p>
+
+      </div>
+    </div>
+    <div class="container no-border rounded m-4">
+      <div class="row">
+        <div class="col-3 no-border">
+          <h3>Initiative list</h3>
+          <ul class="list-group" id="init-list">
+            <li class="list-group-item">First item</li>
+            <li class="list-group-item">Second item</li>
+            <li class="list-group-item">Third item</li>
+          </ul>
+        </div>
+        <div class="col-2 border">
+          <h3>Add PC</h3>
+          <div class="form-group">
+            <label for="usr">Name:</label>
+            <input type="text" class="form-control" id="usr">
+          </div>
+        </div>
+        <div class="col-2 bg-light border">
+          <p class="text-dark">Text 3</p>
+        </div>
+      </div>
+      <div class="row">
+
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"  integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js" type="application/javascript"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
