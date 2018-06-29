@@ -35,6 +35,11 @@ function editPCinit(name, init) {
   updateInitList()
 }
 
+function editNpcHp(name, hp) {
+  initList[findPCindex(name)].hp = hp;
+  updateInitList()
+}
+
 function deletePC(name) {
   initList.splice(findPCindex(name),1);
 }
@@ -72,17 +77,6 @@ function updateInitList() {
       .addClass('col-5')
       .addClass('no-border')
       .appendTo(initPlayer);
-    //
-    // var initBadge = $('<span>')
-    //   .addClass('badge')
-    //   .append(pcList[i].init)
-    //   .appendTo(initCol);
-    // if (pcList[i].init == 0) initBadge.addClass('badge-secondary');
-    // else if (pcList[i].init <= 5) initBadge.addClass('badge-danger');
-    // else if (pcList[i].init <= 10) initBadge.addClass('badge-warning');
-    // else if (pcList[i].init <= 15) initBadge.addClass('badge-info');
-    // else if (pcList[i].init <= 20) initBadge.addClass('badge-primary');
-    // else if (pcList[i].init > 20) initBadge.addClass('badge-success');
 
     var initBtnGroup = $('<div>')
       .addClass('btn-group')
@@ -90,7 +84,6 @@ function updateInitList() {
     var initButton = $('<button>')
       .attr('type', 'button')
       .addClass('btn')
-      //.addClass('btn-primary')
       .addClass('dropdown-toggle')
       .attr('data-toggle', 'dropdown')
       .append(initList[i].init)
@@ -116,20 +109,28 @@ function updateInitList() {
         .appendTo(initMenu);
     }
 
-    var controllBtnGroup = $('<div>')
-      .addClass('btn-group')
-      .appendTo(controlCol);
-    var Button = $('<button>')
-      .attr('type', 'button')
-      .addClass('btn')
-      .append('Button')
-      .appendTo(controllBtnGroup);
-    if (initList[i].init == 0) Button.addClass('btn-secondary');
-    else if (initList[i].init <= 5) Button.addClass('btn-danger');
-    else if (initList[i].init <= 10) Button.addClass('btn-warning');
-    else if (initList[i].init <= 15) Button.addClass('btn-info');
-    else if (initList[i].init <= 20) Button.addClass('btn-primary');
-    else if (initList[i].init > 20) Button.addClass('btn-success');
+    if (initList[i].type == "npc")
+    {
+      var controllBtnGroup = $('<div>')
+        .addClass('btn-group')
+        .appendTo(controlCol);
+      var hpButton = $('<button>')
+        .attr('type', 'button')
+        .addClass('btn')
+        .addClass('btn-danger')
+        .attr('data-toggle', 'modal')
+        .attr('data-target', '#hpModal')
+        .attr('onclick', 'displayHpUpdate("'+initList[i].name+'", '+initList[i].hp+')')
+        .append(initList[i].hp)
+        .appendTo(controllBtnGroup);
+      // if (initList[i].hp == 0) hpButton.addClass('btn-secondary');
+      // else if (initList[i].hp <= 10) hpButton.addClass('btn-danger');
+      // else if (initList[i].hp <= 20) hpButton.addClass('btn-warning');
+      // else if (initList[i].hp <= 35) hpButton.addClass('btn-info');
+      // else if (initList[i].hp <= 50) hpButton.addClass('btn-primary');
+      // else if (initList[i].hp > 50) hpButton.addClass('btn-success');
+    }
+
 
 
     initPlayer.appendTo('#init-list');
@@ -188,3 +189,45 @@ function tryAddNPC(name, hp) {
 
   }
 }
+
+function displayHpUpdate(name, hp) {
+  $('#updateNpcName').val(name);
+  $('#updateNpcHp').val(hp);
+  $('#updateNpcHpSubmit').attr('onclick', 'hpUpdateFromModal()');
+}
+
+function hpUpdateFromModal() {
+  editNpcHp($('#updateNpcName').val(), $('#updateNpcHp').val());
+}
+
+function loadTestData() {
+  addPC('Bug');
+  editPCinit('Bug', 25);
+  addPC('Maveth');
+  editPCinit('Maveth', 19);
+  addPC('Gwen');
+  editPCinit('Gwen', 17);
+  addPC('Meredia');
+  editPCinit('Meredia', 14);
+  addPC('Art');
+  editPCinit('Art', 12);
+  addPC('Vimack');
+  editPCinit('Vimack', 3);
+  addPC('Storm');
+  editPCinit('Storm', 6);
+
+  addNPC('Goblin A', 33);
+  editPCinit('Goblin A', 14)
+  addNPC('Goblin B', 33);
+  editPCinit('Goblin B', 7)
+  addNPC('Goblin C', 33);
+  editPCinit('Goblin C', 4)
+  addNPC('Bugbear', 50);
+  editPCinit('Bugbear', 12)
+  addNPC('Giant', 89);
+  editPCinit('Giant', 10)
+  addNPC('Dragon', 150);
+  editPCinit('Dragon', 9)
+}
+
+loadTestData();

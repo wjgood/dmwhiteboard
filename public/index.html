@@ -22,23 +22,45 @@
       <div class="row" id='rowAddPC'>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Add PC</span>
+            <span class="input-group-text">Add PC</span>
           </div>
-          <input type="text" id="addPC" class="form-control" placeholder="PC Name" >
+          <input type="text" id="addPC" class="form-control" placeholder="Name" >
         </div>
       </div>
       <div class="row" id='rowAddNPC'>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Add NPC</span>
+            <span class="input-group-text">Add NPC</span>
           </div>
-          <input type="text" id="addNpcName" class="form-control" placeholder="NPC Name" >
-          <input type="text" id="addNpcHp" class="form-control" placeholder="NPC HP" >
+          <input type="text" id="addNpcName" class="form-control" placeholder="Name" >
+          <input type="text" id="addNpcHp" class="form-control" placeholder="HP" >
         </div>
       </div>
 
       <div id="init-list">
 
+      </div>
+
+      <div class="modal" id="hpModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Update HP</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                </div>
+                <input type="hidden" id="updateNpcName" class="form-control" value="" >
+                <input type="text" id="updateNpcHp" class="form-control" placeholder="HP" >
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" data-dismiss="modal" id="updateNpcHpSubmit">Update</button>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
