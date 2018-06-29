@@ -45,40 +45,42 @@ function updateInitList() {
   {
     //console.log("PC: ");
     //console.log(pcList[i]);
-    var initPlayer = $('<li>')
-      .addClass('list-group-item');
+    var initPlayer = $('<div>')
+      .addClass('row')
+      .addClass('border-bottom')
+      .addClass('py-1');
+    var initCol = $('<div>')
+      .addClass('col-1')
+      .addClass('no-border')
+      .appendTo(initPlayer);
+    var nameCol = $('<div>')
+      .addClass('col')
+      .addClass('no-border')
+      .append(pcList[i].name)
+      .appendTo(initPlayer);
+    var controlCol = $('<div>')
+      .addClass('col-4')
+      .addClass('no-border')
+      .appendTo(initPlayer);
+
     var initBadge = $('<span>')
       .addClass('badge')
-      //.addClass('badge-secondary')
-      .addClass('mr-1')
-      .append(pcList[i].init);
+      .append(pcList[i].init)
+      .appendTo(initCol);
     if (pcList[i].init == 0) initBadge.addClass('badge-secondary');
     else if (pcList[i].init <= 5) initBadge.addClass('badge-danger');
     else if (pcList[i].init <= 10) initBadge.addClass('badge-warning');
     else if (pcList[i].init <= 15) initBadge.addClass('badge-info');
     else if (pcList[i].init <= 20) initBadge.addClass('badge-primary');
     else if (pcList[i].init > 20) initBadge.addClass('badge-success');
-    // var initButton = $('<a>')
-    //   //.attr('type', 'button')
-    //   .attr('href', '#')
-    //   .addClass('initEdit')
-    //   .attr('id', pcList[i].name)
-    //   //.addClass('btn')
-    //   //.addClass('btn-sm')
-    //   //.addClass('btn-primary')
-    //   .addClass('ml-4')
-    //   .attr('data-toggle', 'popover')
-    //   .attr('data-trigger', 'click')
-    //   .attr('data-html', 'true')
-    //   //.attr('title', 'Set Initiative')
-    //   .attr('data-content', '<div class="input-group input-group-sm mb-3"><div class="input-group-prepend"><span class="input-group-text" id="inputGroup-sizing-sm">Set Initiative</span>  </div>  <input type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"></div>')
-    //   .append('<i class="fas fa-info"></i>');
 
     var btnGroup = $('<div>')
       .addClass('btn-group')
-      .addClass('ml-4');
-    var initButton = $('<button>').attr('type', 'button')
-      .addClass('btn').addClass('btn-primary')
+      .appendTo(controlCol);
+    var initButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('btn')
+      .addClass('btn-primary')
       .addClass('dropdown-toggle')
       .attr('data-toggle', 'dropdown')
       .append('<i class="fas fa-info"></i>')
@@ -96,9 +98,7 @@ function updateInitList() {
         .append(ii)
         .appendTo(initMenu);
     }
-    initPlayer.append(initBadge);
-    initPlayer.append(pcList[i].name);
-    initPlayer.append(btnGroup);
+
     initPlayer.appendTo('#init-list');
   }
 }
@@ -109,7 +109,7 @@ $('#addPC').keypress(function(event) {
     {
       //console.log("Adding PC: " + $('#addPC').val());
       addPC($('#addPC').val());
-      $('#adPC').val('');
+      $('#addPC').val('');
       updateInitList();
       $('[data-toggle="popover"]').popover();
     }
