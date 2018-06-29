@@ -3,3 +3,9 @@
   max-width: 120px;
   margin-bottom: 20px;
 }
+
+div.scrollable-menu {
+  height: auto;
+  max-height: 200px;
+  overflow-x: hidden;
+}
