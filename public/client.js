@@ -38,7 +38,8 @@ function addPC(name) {
   var newPc = {
     type: "pc",
     name: name,
-    init: 0
+    init: 0,
+    notes: ""
   };
   //console.log("Adding PC: ");
   //console.log(newPc);
@@ -52,7 +53,8 @@ function addNPC(name, hp) {
     type: "npc",
     name: name,
     hp: hp,
-    init: 0
+    init: 0,
+    notes: ""
   };
   initList.push(newNpc);
   updateInitList();
@@ -89,6 +91,12 @@ function editPCinit(name, init) {
 
 function editNpcHp(name, hp) {
   initList[findPCindex(name)].hp = hp;
+  updateInitList();
+}
+
+function editPcNotes(name, notes) {
+  console.log(name);
+  initList[findPCindex(name)].notes = notes;
   updateInitList();
 }
 
@@ -130,7 +138,7 @@ function updateInitList() {
       .append(initList[i].name)
       .appendTo(initPlayer);
     var controlCol = $('<div>')
-      .addClass('col-5')
+      .addClass('col-7')
       .addClass('no-border')
       .appendTo(initPlayer);
 
@@ -165,12 +173,13 @@ function updateInitList() {
         .appendTo(initMenu);
     }
 
+    var controllBtnGroup = $('<div>')
+      .addClass('btn-group')
+      .appendTo(controlCol);
+
     if (initList[i].type == "npc")
     {
       initPlayer.addClass('bg-light');
-      var controllBtnGroup = $('<div>')
-        .addClass('btn-group')
-        .appendTo(controlCol);
       var hpButton = $('<button>')
         .attr('type', 'button')
         .addClass('btn')
@@ -187,6 +196,17 @@ function updateInitList() {
       // else if (initList[i].hp <= 50) hpButton.addClass('btn-primary');
       // else if (initList[i].hp > 50) hpButton.addClass('btn-success');
     }
+
+    var notesButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('btn')
+      .addClass('btn-secondary')
+      .attr('data-toggle', 'modal')
+      .attr('data-target', '#notesModal')
+      .attr('onclick', 'displayNotesUpdate("'+initList[i].name+'", "'+initList[i].notes+'")')
+      .append('<i class="fas fa-sticky-note pr-1"></i>')
+      .append(initList[i].notes)
+      .appendTo(controllBtnGroup);
 
     var delButton = $('<button>')
       .attr('type', 'button')
@@ -260,9 +280,6 @@ $('#addPc').click(function() {
 });
 
 function tryAddPc(name) {
-  console.log(name);
-  console.log(findPCindex(name));
-  console.log((findPCindex(name) < 0));
   if (name && (findPCindex(name) < 0)) {
     addPC(name);
     $('#addPcName').val('');
@@ -388,6 +405,15 @@ function hpUpdateFromModal() {
   editNpcHp($('#updateNpcName').val(), $('#updateNpcHp').val());
 }
 
+function displayNotesUpdate(name, notes) {
+  $('#updateNotesName').val(name);
+  $('#updateNotesText').val(notes);
+  $('#updateNotesSubmit').attr('onclick', 'notesUpdateFromModal()')
+}
+
+function notesUpdateFromModal() {
+  editPcNotes($('#updateNotesName').val(), $('#updateNotesText').val());
+}
 
 
 
