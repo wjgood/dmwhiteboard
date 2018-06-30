@@ -251,18 +251,21 @@ function updateNpcTemplateList() {
 
 $('#addPcName').keypress(function(event) {
   if (event.which == 13) {
-    tryAddPc($('#addPC').val());
+    tryAddPc($('#addPcName').val());
   }
 });
 
 $('#addPc').click(function() {
-  tryAddPc($('#addPC').val());
+  tryAddPc($('#addPcName').val());
 });
 
 function tryAddPc(name) {
-  if (name && (findPCindex(name) >= 0)) {
-    addPC($('#addPC').val());
-    $('#addPC').val('');
+  console.log(name);
+  console.log(findPCindex(name));
+  console.log((findPCindex(name) < 0));
+  if (name && (findPCindex(name) < 0)) {
+    addPC(name);
+    $('#addPcName').val('');
   }
   else {
     var alert = $('<div>')
