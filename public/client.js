@@ -1,10 +1,11 @@
 var socket = io(); //we'll use this later
 
-
+/////////////////////////// DATA INITIALIZATION ////////////////////////
 var initList = [];
 //var pcList = [];
 var npcTemplateList = [];
 
+/////////////////////////// LOCAL STORAGE ////////////////////////
 if (localStorage.initList) {
   console.log("Loading Local store");
   console.log(localStorage.initList);
@@ -25,8 +26,8 @@ else {
   localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
 }
 
-
-function findPCindex(name) {
+/////////////////////////// MODEL AND CRUD FUNCTIONS ////////////////////////
+function findPcIndex(name) {
   return initList.findIndex(obj => obj.name == name);
 }
 
@@ -34,7 +35,7 @@ function findNpcTemplateIndex(name) {
     return npcTemplateList.findIndex(obj => obj.name == name);
 }
 
-function addPC(name) {
+function addPc(name) {
   var newPc = {
     type: "pc",
     name: name,
@@ -48,7 +49,7 @@ function addPC(name) {
   updateInitList();
 }
 
-function addNPC(name, hp) {
+function addNpc(name, hp) {
   var newNpc = {
     type: "npc",
     name: name,
@@ -73,9 +74,9 @@ function addNpcFromTemplate(name, hp) {
   var count = 1;
   while (count) {
     var newName = name + count.toString();
-    if (findPCindex(newName) == -1)
+    if (findPcIndex(newName) == -1)
     {
-      addNPC(newName, hp);
+      addNpc(newName, hp);
       count = 0;
     }
     else {
@@ -84,24 +85,24 @@ function addNpcFromTemplate(name, hp) {
   }
 }
 
-function editPCinit(name, init) {
-  initList[findPCindex(name)].init = init;
+function editPcInit(name, init) {
+  initList[findPcIndex(name)].init = init;
   updateInitList();
 }
 
 function editNpcHp(name, hp) {
-  initList[findPCindex(name)].hp = hp;
+  initList[findPcIndex(name)].hp = hp;
   updateInitList();
 }
 
 function editPcNotes(name, notes) {
   console.log(name);
-  initList[findPCindex(name)].notes = notes;
+  initList[findPcIndex(name)].notes = notes;
   updateInitList();
 }
 
 function deletePC(name) {
-  initList.splice(findPCindex(name),1);
+  initList.splice(findPcIndex(name),1);
   updateInitList();
 }
 
@@ -111,7 +112,7 @@ function deleteNpcTemplate(name) {
 }
 
 
-
+/////////////////////////// VIEW LIST UPDATES ////////////////////////
 function initCompare(pcA, pcB) {
   return (pcB.init - pcA.init);
 }
@@ -168,7 +169,7 @@ function updateInitList() {
       var num = $('<button>')
         .addClass('btn')
         .addClass('dropdown-item')
-        .attr('onclick','editPCinit("'+initList[i].name+'", '+ii+')')
+        .attr('onclick','editPcInit("'+initList[i].name+'", '+ii+')')
         .append(ii)
         .appendTo(initMenu);
     }
@@ -189,12 +190,7 @@ function updateInitList() {
         .attr('onclick', 'displayHpUpdate("'+initList[i].name+'", '+initList[i].hp+')')
         .append(initList[i].hp)
         .appendTo(controllBtnGroup);
-      // if (initList[i].hp == 0) hpButton.addClass('btn-secondary');
-      // else if (initList[i].hp <= 10) hpButton.addClass('btn-danger');
-      // else if (initList[i].hp <= 20) hpButton.addClass('btn-warning');
-      // else if (initList[i].hp <= 35) hpButton.addClass('btn-info');
-      // else if (initList[i].hp <= 50) hpButton.addClass('btn-primary');
-      // else if (initList[i].hp > 50) hpButton.addClass('btn-success');
+
     }
 
     var notesButton = $('<button>')
@@ -267,8 +263,7 @@ function updateNpcTemplateList() {
 }
 
 
-
-
+/////////////////////////// EVENT HANDLERS ////////////////////////
 $('#addPcName').keypress(function(event) {
   if (event.which == 13) {
     tryAddPc($('#addPcName').val());
@@ -280,8 +275,8 @@ $('#addPc').click(function() {
 });
 
 function tryAddPc(name) {
-  if (name && (findPCindex(name) < 0)) {
-    addPC(name);
+  if (name && (findPcIndex(name) < 0)) {
+    addPc(name);
     $('#addPcName').val('');
   }
   else {
@@ -307,7 +302,7 @@ $('#resetPCs').click(function() {
     }
   }
   for(var i = 0; i < editList.length; i++) {
-      editPCinit(editList[i], 0);
+      editPcInit(editList[i], 0);
   }
 });
 
@@ -336,7 +331,7 @@ $('#addNpc').click(function() {
 function tryAddNPC(name, hp) {
   if (name && hp)
   {
-    addNPC(name, hp);
+    addNpc(name, hp);
     $('#addNpcName').val('');
     $('#addNpcHp').val('');
   }
@@ -395,16 +390,50 @@ $('#deleteNPCs').click(function() {
   }
 });
 
+
+/////////////////////////// HP UPDATE BOX ////////////////////////
 function displayHpUpdate(name, hp) {
   $('#updateNpcName').val(name);
   $('#updateNpcHp').val(hp);
+  $('#updateNpcHpHealText').val(0);
+  $('#updateNpcHpDamageText').val(0);
   $('#updateNpcHpSubmit').attr('onclick', 'hpUpdateFromModal()');
 }
+
+$('#updateNpcHpHealBtn').click(function() {
+  var hp =  Number($('#updateNpcHp').val());
+  var healing = Number($('#updateNpcHpHealText').val());
+  $('#updateNpcHp').val(hp+1);
+  $('#updateNpcHpHealText').val(healing+1);
+});
+
+$('#updateNpcHpHealText').change(function() {
+  console.log("test");
+  var healing = Number($('#updateNpcHpHealText').val());
+  var hp =  Number($('#updateNpcHp').val());
+  $('#updateNpcHp').val(hp+healing);
+});
+
+$('#updateNpcHpDamageBtn').click(function() {
+  var hp =  Number($('#updateNpcHp').val());
+  var damage = Number($('#updateNpcHpDamageText').val());
+  $('#updateNpcHp').val(hp-1);
+  $('#updateNpcHpDamageText').val(damage+1);
+});
+
+$('#updateNpcHpDamageText').change(function() {
+  var damage = Number($('#updateNpcHpDamageText').val());
+  var hp =  Number($('#updateNpcHp').val());
+  $('#updateNpcHp').val(hp-damage);
+
+});
 
 function hpUpdateFromModal() {
   editNpcHp($('#updateNpcName').val(), $('#updateNpcHp').val());
 }
 
+
+/////////////////////////// NOTES UPDATE BOX ////////////////////////
 function displayNotesUpdate(name, notes) {
   $('#updateNotesName').val(name);
   $('#updateNotesText').val(notes);
@@ -418,35 +447,35 @@ function notesUpdateFromModal() {
 
 
 
-
+/////////////////////////// TEST DATA ////////////////////////
 function loadTestData() {
-  addPC('Bug');
-  editPCinit('Bug', 25);
-  addPC('Maveth');
-  editPCinit('Maveth', 19);
-  addPC('Gwen');
-  editPCinit('Gwen', 17);
-  addPC('Meredia');
-  editPCinit('Meredia', 14);
-  addPC('Art');
-  editPCinit('Art', 12);
-  addPC('Vimack');
-  editPCinit('Vimack', 3);
-  addPC('Storm');
-  editPCinit('Storm', 6);
+  addPc('Bug');
+  editPcInit('Bug', 25);
+  addPc('Maveth');
+  editPcInit('Maveth', 19);
+  addPc('Gwen');
+  editPcInit('Gwen', 17);
+  addPc('Meredia');
+  editPcInit('Meredia', 14);
+  addPc('Art');
+  editPcInit('Art', 12);
+  addPc('Vimack');
+  editPcInit('Vimack', 3);
+  addPc('Storm');
+  editPcInit('Storm', 6);
 
-  // addNPC('Goblin A', 33);
-  // editPCinit('Goblin A', 14)
-  // addNPC('Goblin B', 33);
-  // editPCinit('Goblin B', 7)
-  // addNPC('Goblin C', 33);
-  // editPCinit('Goblin C', 4)
-  // addNPC('Bugbear', 50);
-  // editPCinit('Bugbear', 12)
-  // addNPC('Giant', 89);
-  // editPCinit('Giant', 10)
-  // addNPC('Dragon', 150);
-  // editPCinit('Dragon', 9)
+  // addNpc('Goblin A', 33);
+  // editPcInit('Goblin A', 14)
+  // addNpc('Goblin B', 33);
+  // editPcInit('Goblin B', 7)
+  // addNpc('Goblin C', 33);
+  // editPcInit('Goblin C', 4)
+  // addNpc('Bugbear', 50);
+  // editPcInit('Bugbear', 12)
+  // addNpc('Giant', 89);
+  // editPcInit('Giant', 10)
+  // addNpc('Dragon', 150);
+  // editPcInit('Dragon', 9)
 
   addNpcTemplate('Goblin', 30);
   addNpcTemplate('Bandit', 45);
