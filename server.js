@@ -1,5 +1,5 @@
 
-const PORT = 80;
+const PORT = process.env.PORT || 3000;
 
 var fs = require('fs');
 var path = require('path');
