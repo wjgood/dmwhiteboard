@@ -1,8 +1,38 @@
 var socket = io(); //we'll use this later
 
+
 var initList = [];
 //var pcList = [];
-//var npcList = [];
+var npcTemplateList = [];
+
+if (localStorage.initList) {
+  console.log("Loading Local store");
+  console.log(localStorage.initList);
+  initList = JSON.parse(localStorage.initList);
+  updateInitList();
+}
+else {
+  localStorage.initList = JSON.stringify(initList);
+}
+
+if (localStorage.npcTemplateList) {
+  console.log("Loading Local store");
+  console.log(localStorage.npcTemplateList);
+  npcTemplateList = JSON.parse(localStorage.npcTemplateList);
+  updateNpcTemplateList();
+}
+else {
+  localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
+}
+
+
+function findPCindex(name) {
+  return initList.findIndex(obj => obj.name == name);
+}
+
+function findNpcTemplateIndex(name) {
+    return npcTemplateList.findIndex(obj => obj.name == name);
+}
 
 function addPC(name) {
   var newPc = {
@@ -14,6 +44,7 @@ function addPC(name) {
   //console.log(newPc);
   //pcList.push(newPc);
   initList.push(newPc);
+  updateInitList();
 }
 
 function addNPC(name, hp) {
@@ -24,25 +55,53 @@ function addNPC(name, hp) {
     init: 0
   };
   initList.push(newNpc);
+  updateInitList();
 }
 
-function findPCindex(name) {
-  return initList.findIndex(obj => obj.name == name);
+function addNpcTemplate(name, hp) {
+  var newTemplate = {
+    name: name,
+    hp: hp
+  }
+  npcTemplateList.push(newTemplate);
+  updateNpcTemplateList();
+}
+
+function addNpcFromTemplate(name, hp) {
+  var count = 1;
+  while (count) {
+    var newName = name + count.toString();
+    if (findPCindex(newName) == -1)
+    {
+      addNPC(newName, hp);
+      count = 0;
+    }
+    else {
+      count++;
+    }
+  }
 }
 
 function editPCinit(name, init) {
   initList[findPCindex(name)].init = init;
-  updateInitList()
+  updateInitList();
 }
 
 function editNpcHp(name, hp) {
   initList[findPCindex(name)].hp = hp;
-  updateInitList()
+  updateInitList();
 }
 
 function deletePC(name) {
   initList.splice(findPCindex(name),1);
+  updateInitList();
 }
+
+function deleteNpcTemplate(name) {
+  npcTemplateList.splice(findNpcTemplateIndex(name),1);
+  updateNpcTemplateList();
+}
+
 
 
 function initCompare(pcA, pcB) {
@@ -50,11 +109,7 @@ function initCompare(pcA, pcB) {
 }
 
 function updateInitList() {
-  //console.log("PC List: ");
-  //console.log(pcList);
   initList.sort(initCompare);
-  //console.log("PC List: ");
-  //console.log(pcList);
   $('#init-list').empty();
   for (var i = 0; i < initList.length; i++)
   {
@@ -71,6 +126,7 @@ function updateInitList() {
     var nameCol = $('<div>')
       .addClass('col')
       .addClass('no-border')
+      .addClass('my-auto')
       .append(initList[i].name)
       .appendTo(initPlayer);
     var controlCol = $('<div>')
@@ -99,7 +155,7 @@ function updateInitList() {
       .addClass('dropdown-menu')
       .addClass('scrollable-menu')
       .appendTo(initBtnGroup);
-    for (var ii = 30; ii > 0; ii--)
+    for (var ii = 30; ii >= 0; ii--)
     {
       var num = $('<button>')
         .addClass('btn')
@@ -111,6 +167,7 @@ function updateInitList() {
 
     if (initList[i].type == "npc")
     {
+      initPlayer.addClass('bg-light');
       var controllBtnGroup = $('<div>')
         .addClass('btn-group')
         .appendTo(controlCol);
@@ -131,21 +188,106 @@ function updateInitList() {
       // else if (initList[i].hp > 50) hpButton.addClass('btn-success');
     }
 
-
+    var delButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('close')
+      .attr('onclick', 'deletePC("' + initList[i].name + '")')
+      .append('&times;')
+      .appendTo(initPlayer);
 
     initPlayer.appendTo('#init-list');
   }
+  console.log("Saving to Local store");
+  localStorage.initList = JSON.stringify(initList);
 }
 
-$('#addPC').keypress(function(event) {
+function updateNpcTemplateList() {
+  $('#template-list').empty();
+  for (var i = 0; i < npcTemplateList.length; i++) {
+    var templateNpc = $('<div>')
+      .addClass('row')
+      .addClass('border-bottom')
+      .addClass('py-1');
+    var nameCol = $('<div>')
+      .addClass('col')
+      .addClass('no-border')
+      .addClass('my-auto')
+      .append(npcTemplateList[i].name)
+      .appendTo(templateNpc);
+    var hpCol = $('<div>')
+      .addClass('col-2')
+      .addClass('no-border')
+      .addClass('my-auto')
+      .append(npcTemplateList[i].hp)
+      .appendTo(templateNpc);
+    var controlCol = $('<div>')
+      .addClass('col-4')
+      .addClass('no-border')
+      .appendTo(templateNpc);
+    var addButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('btn')
+      .addClass('btn-success')
+      .attr('onclick', 'addNpcFromTemplate("'+npcTemplateList[i].name+'", '+npcTemplateList[i].hp+')')
+      .append('<i class="fas fa-plus"></i>')
+      .appendTo(controlCol);
+
+    var delButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('close')
+      .attr('onclick', 'deleteNpcTemplate("' + npcTemplateList[i].name + '")')
+      .append('&times;')
+      .appendTo(templateNpc);
+
+    templateNpc.appendTo($('#template-list'));
+  }
+
+  console.log("Saving to Local store");
+  localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
+}
+
+
+
+
+$('#addPcName').keypress(function(event) {
   if (event.which == 13) {
-    if ($('#addPC').val())
-    {
-      //console.log("Adding PC: " + $('#addPC').val());
-      addPC($('#addPC').val());
-      $('#addPC').val('');
-      updateInitList();
+    tryAddPc($('#addPC').val());
+  }
+});
+
+$('#addPc').click(function() {
+  tryAddPc($('#addPC').val());
+});
+
+function tryAddPc(name) {
+  if (name && (findPCindex(name) >= 0)) {
+    addPC($('#addPC').val());
+    $('#addPC').val('');
+  }
+  else {
+    var alert = $('<div>')
+      .addClass('row')
+      .addClass('alert')
+      .addClass('alert-warning')
+      .addClass('alert-dismissible')
+      .addClass('fade')
+      .addClass('show')
+      .attr('role', 'alert')
+      .append('Make sure your PC has a unique name!')
+      .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+      .insertBefore($('#rowAddPC'));
+  }
+}
+
+$('#resetPCs').click(function() {
+  var editList = [];
+  for (var i = 0; i < initList.length; i++) {
+    if (initList[i].type == "pc") {
+      editList.push(initList[i].name);
     }
+  }
+  for(var i = 0; i < editList.length; i++) {
+      editPCinit(editList[i], 0);
   }
 });
 
@@ -165,13 +307,18 @@ $('#addNpcHp').keypress(function(event) {
   }
 });
 
+$('#addNpc').click(function() {
+    var npcName = $('#addNpcName').val();
+    var npcHP = $('#addNpcHp').val();
+    tryAddNPC(npcName, npcHP);
+});
+
 function tryAddNPC(name, hp) {
   if (name && hp)
   {
     addNPC(name, hp);
     $('#addNpcName').val('');
     $('#addNpcHp').val('');
-    updateInitList();
   }
   else
   {
@@ -190,6 +337,44 @@ function tryAddNPC(name, hp) {
   }
 }
 
+$('#addNpcTemplate').click(function() {
+    var name = $('#addNpcName').val();
+    var hp = $('#addNpcHp').val();
+    if (name && hp)
+    {
+      addNpcTemplate(name, hp);
+      $('#addNpcName').val('');
+      $('#addNpcHp').val('');
+    }
+    else
+    {
+      var alert = $('<div>')
+        .addClass('row')
+        .addClass('alert')
+        .addClass('alert-warning')
+        .addClass('alert-dismissible')
+        .addClass('fade')
+        .addClass('show')
+        .attr('role', 'alert')
+        .append('Make sure your NPC has both a name and HP!')
+        .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+        .insertBefore($('#rowAddNPC'));
+
+    }
+});
+
+$('#deleteNPCs').click(function() {
+  var editList = [];
+  for (var i = 0; i < initList.length; i++) {
+    if (initList[i].type == "npc") {
+      editList.push(initList[i].name);
+    }
+  }
+  for(var i = 0; i < editList.length; i++) {
+      deletePC(editList[i]);
+  }
+});
+
 function displayHpUpdate(name, hp) {
   $('#updateNpcName').val(name);
   $('#updateNpcHp').val(hp);
@@ -199,6 +384,11 @@ function displayHpUpdate(name, hp) {
 function hpUpdateFromModal() {
   editNpcHp($('#updateNpcName').val(), $('#updateNpcHp').val());
 }
+
+
+
+
+
 
 function loadTestData() {
   addPC('Bug');
@@ -216,18 +406,26 @@ function loadTestData() {
   addPC('Storm');
   editPCinit('Storm', 6);
 
-  addNPC('Goblin A', 33);
-  editPCinit('Goblin A', 14)
-  addNPC('Goblin B', 33);
-  editPCinit('Goblin B', 7)
-  addNPC('Goblin C', 33);
-  editPCinit('Goblin C', 4)
-  addNPC('Bugbear', 50);
-  editPCinit('Bugbear', 12)
-  addNPC('Giant', 89);
-  editPCinit('Giant', 10)
-  addNPC('Dragon', 150);
-  editPCinit('Dragon', 9)
+  // addNPC('Goblin A', 33);
+  // editPCinit('Goblin A', 14)
+  // addNPC('Goblin B', 33);
+  // editPCinit('Goblin B', 7)
+  // addNPC('Goblin C', 33);
+  // editPCinit('Goblin C', 4)
+  // addNPC('Bugbear', 50);
+  // editPCinit('Bugbear', 12)
+  // addNPC('Giant', 89);
+  // editPCinit('Giant', 10)
+  // addNPC('Dragon', 150);
+  // editPCinit('Dragon', 9)
+
+  addNpcTemplate('Goblin', 30);
+  addNpcTemplate('Bandit', 45);
+  addNpcTemplate('Bugbear', 60);
+  addNpcTemplate('Giant', 85);
+  addNpcTemplate('Dragon', 110);
+  addNpcTemplate('Big Dragon', 150);
+
 }
 
-loadTestData();
+//loadTestData();

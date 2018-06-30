@@ -13,20 +13,28 @@
         <h1 class="display-4">
           <!--<img id='logo' src="images/logo_1.png" class="img-responsive" alt="Logo">-->
           DM's Whiteboard
+          <small>alpha</small>
         </h1>
         <p class="lead">Hopefully better than just writing shit down.</p>
 
       </div>
     </div>
+
     <div class="container no-border rounded m-4">
+
       <div class="row" id='rowAddPC'>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text">Add PC</span>
           </div>
-          <input type="text" id="addPC" class="form-control" placeholder="Name" >
+          <input type="text" id="addPcName" class="form-control" placeholder="Name" >
+          <div class="input-group-append">
+            <button type="button" id="addPc" class="btn btn-primary">Add</button>
+            <button type="button" id="resetPCs" class="btn btn-outline-danger">Reset PCs</button>
+          </div>
         </div>
       </div>
+
       <div class="row" id='rowAddNPC'>
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -34,11 +42,27 @@
           </div>
           <input type="text" id="addNpcName" class="form-control" placeholder="Name" >
           <input type="text" id="addNpcHp" class="form-control" placeholder="HP" >
+          <div class="input-group-append">
+            <button type="button" id="addNpc" class="btn btn-primary">Add</button>
+            <button type="button" id="addNpcTemplate" class="btn btn-info">Add As Template</button>
+            <button type="button" id="deleteNPCs" class="btn btn-outline-danger">Delete NPCs</button>
+          </div>
         </div>
       </div>
 
-      <div id="init-list">
-
+      <div class="row mb-3">
+        <div class="col-lg-9 mb-3">
+          <div class="container no-border" id="init-list">
+          </div>
+        </div>
+        <div class="col-lg-3 border-left mb-3">
+          <div class="row">
+              <div class="container no-border" id="template-list">
+              </div>
+          </div>
+          <div class="container no-border" class="row">
+          </div>
+        </div>
       </div>
 
       <div class="modal" id="hpModal">
