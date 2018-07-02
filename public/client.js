@@ -126,14 +126,26 @@ function editPcInit(name, init) {
   updateInitList();
 }
 
-function editNpcHp(name, hp) {
-  initList[findPcIndex(name)].hp = hp;
+function editNpcHp(name, hp, groupName) {
+  if (groupName) {
+    var groupIndex = findPcIndex(groupName);
+    var memberIndex = initList[groupIndex].members.findIndex(obj => obj.name == name);
+    initList[groupIndex].members[memberIndex].hp = Number(hp);
+  } else {
+    initList[findPcIndex(name)].hp = hp;
+  }
   updateInitList();
 }
 
-function editPcNotes(name, notes) {
-  console.log(name);
-  initList[findPcIndex(name)].notes = notes;
+function editPcNotes(name, notes, groupName) {
+  if (groupName) {
+    var groupIndex = findPcIndex(groupName);
+    var memberIndex = initList[groupIndex].members.findIndex(obj => obj.name == name);
+    initList[groupIndex].members[memberIndex].notes = notes;
+  } else {
+    initList[findPcIndex(name)].notes = notes;
+  }
+
   updateInitList();
 }
 
@@ -261,6 +273,7 @@ function updateInitList() {
         console.log(initList[i].members[member]);
         var controlBtnGroup = $('<div>')
           .addClass('btn-group')
+          .addClass('float-left')
           .addClass('mb-1')
           .addClass('mr-1')
           .appendTo(controlCol);
@@ -276,7 +289,7 @@ function updateInitList() {
           .addClass('btn-danger')
           .attr('data-toggle', 'modal')
           .attr('data-target', '#hpModal')
-          .attr('onclick', 'displayHpUpdate("'+initList[i].members[member].name+'", '+initList[i].members[member].hp+')')
+          .attr('onclick', 'displayHpUpdate("'+initList[i].members[member].name+'", '+initList[i].members[member].hp+', "'+initList[i].name+'")')
           .append(initList[i].members[member].hp)
           .appendTo(controlBtnGroup);
         var notesButton = $('<button>')
@@ -285,16 +298,13 @@ function updateInitList() {
           .addClass('btn-secondary')
           .attr('data-toggle', 'modal')
           .attr('data-target', '#notesModal')
-          .attr('onclick', 'displayNotesUpdate("'+initList[i].members[member].name+'", "'+initList[i].members[member].notes+'")')
+          .attr('onclick', 'displayNotesUpdate("'+initList[i].members[member].name+'", "'+initList[i].members[member].notes+'", "'+initList[i].name+'")')
           .append('<i class="fas fa-sticky-note pr-1"></i>')
           .append(initList[i].members[member].notes)
           .appendTo(controlBtnGroup);
       }
 
     }
-
-
-
 
     var delButton = $('<button>')
       .attr('type', 'button')
@@ -500,8 +510,9 @@ $('#deleteNPCs').click(function() {
 
 
 /////////////////////////// HP UPDATE BOX ////////////////////////
-function displayHpUpdate(name, hp) {
+function displayHpUpdate(name, hp, groupName) {
   $('#updateNpcName').val(name);
+  $('#updateNpcGroupName').val(groupName);
   $('#updateNpcHp').val(hp);
   $('#updateNpcHpHealText').val(0);
   $('#updateNpcHpDamageText').val(0);
@@ -537,19 +548,20 @@ $('#updateNpcHpDamageText').change(function() {
 });
 
 function hpUpdateFromModal() {
-  editNpcHp($('#updateNpcName').val(), $('#updateNpcHp').val());
+  editNpcHp($('#updateNpcName').val(), Number($('#updateNpcHp').val()), $('#updateNpcGroupName').val());
 }
 
 
 /////////////////////////// NOTES UPDATE BOX ////////////////////////
-function displayNotesUpdate(name, notes) {
+function displayNotesUpdate(name, notes, groupName) {
   $('#updateNotesName').val(name);
+  $('#updateNotesGroupName').val(groupName);
   $('#updateNotesText').val(notes);
   $('#updateNotesSubmit').attr('onclick', 'notesUpdateFromModal()')
 }
 
 function notesUpdateFromModal() {
-  editPcNotes($('#updateNotesName').val(), $('#updateNotesText').val());
+  editPcNotes($('#updateNotesName').val(), $('#updateNotesText').val(), $('#updateNotesGroupName').val() );
 }
 
 
