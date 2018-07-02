@@ -71,18 +71,54 @@ function addNpcTemplate(name, hp) {
 }
 
 function addNpcFromTemplate(name, hp) {
-  var count = 1;
-  while (count) {
-    var newName = name + count.toString();
-    if (findPcIndex(newName) == -1)
-    {
-      addNpc(newName, hp);
-      count = 0;
+  var quantity = Number($('#'+name+'-templateQuantity').val());
+  if (quantity == 1) {
+    var count = 1;
+    while (count) {
+      var newName = name + count.toString();
+      if (findPcIndex(newName) == -1) {
+        addNpc(newName, hp);
+        count = 0;
+      } else {
+        count++;
+      }
     }
-    else {
-      count++;
+  } else {
+    var count = 1;
+    while (count) {
+      var groupName = name + 'Group' + count.toString();
+      if (findPcIndex(groupName) == -1) {
+        addNpcGroup(groupName, quantity, name, hp);
+        count = 0;
+      } else {
+        count++;
+      }
     }
   }
+}
+
+function addNpcGroup(groupName, quantity, npcName, hp) {
+  var members = [];
+  for (var i = 1; i <= quantity; i++) {
+    var member = {
+      type: "npc",
+      name: npcName+i,
+      hp: hp,
+      notes: ""
+    }
+    members.push(member);
+  }
+
+  var newNpcGroup = {
+    type: 'npcGroup',
+    name: groupName,
+    init: 0,
+    members: members
+  }
+
+  initList.push(newNpcGroup);
+  updateInitList();
+
 }
 
 function editPcInit(name, init) {
@@ -136,10 +172,13 @@ function updateInitList() {
       .addClass('col')
       .addClass('no-border')
       .addClass('my-auto')
-      .append(initList[i].name)
       .appendTo(initPlayer);
+    var nameSpan = $('<span>')
+      .addClass('text-center')
+      .append(initList[i].name)
+      .appendTo(nameCol);
     var controlCol = $('<div>')
-      .addClass('col-7')
+      .addClass('col-8')
       .addClass('no-border')
       .appendTo(initPlayer);
 
@@ -174,13 +213,26 @@ function updateInitList() {
         .appendTo(initMenu);
     }
 
-    var controllBtnGroup = $('<div>')
-      .addClass('btn-group')
-      .appendTo(controlCol);
+    if (initList[i].type == "pc") {
+      var controlBtnGroup = $('<div>')
+        .addClass('btn-group')
+        .appendTo(controlCol);
+      var notesButton = $('<button>')
+        .attr('type', 'button')
+        .addClass('btn')
+        .addClass('btn-secondary')
+        .attr('data-toggle', 'modal')
+        .attr('data-target', '#notesModal')
+        .attr('onclick', 'displayNotesUpdate("'+initList[i].name+'", "'+initList[i].notes+'")')
+        .append('<i class="fas fa-sticky-note pr-1"></i>')
+        .append(initList[i].notes)
+        .appendTo(controlBtnGroup);
 
-    if (initList[i].type == "npc")
-    {
+    } else if (initList[i].type == "npc") {
       initPlayer.addClass('bg-light');
+      var controlBtnGroup = $('<div>')
+        .addClass('btn-group')
+        .appendTo(controlCol);
       var hpButton = $('<button>')
         .attr('type', 'button')
         .addClass('btn')
@@ -189,20 +241,60 @@ function updateInitList() {
         .attr('data-target', '#hpModal')
         .attr('onclick', 'displayHpUpdate("'+initList[i].name+'", '+initList[i].hp+')')
         .append(initList[i].hp)
-        .appendTo(controllBtnGroup);
+        .appendTo(controlBtnGroup);
+      var notesButton = $('<button>')
+        .attr('type', 'button')
+        .addClass('btn')
+        .addClass('btn-secondary')
+        .attr('data-toggle', 'modal')
+        .attr('data-target', '#notesModal')
+        .attr('onclick', 'displayNotesUpdate("'+initList[i].name+'", "'+initList[i].notes+'")')
+        .append('<i class="fas fa-sticky-note pr-1"></i>')
+        .append(initList[i].notes)
+        .appendTo(controlBtnGroup);
+
+    } else if (initList[i].type == "npcGroup") {
+      initPlayer.addClass('bg-light');
+      nameSpan.addClass('align-top');
+      console.log(initList[i].members);
+      for (var member in initList[i].members) {
+        console.log(initList[i].members[member]);
+        var controlBtnGroup = $('<div>')
+          .addClass('btn-group')
+          .addClass('mb-1')
+          .addClass('mr-1')
+          .appendTo(controlCol);
+        var memberName = $('<button>')
+          .attr('type', 'button')
+          .addClass('btn btn-outline-primary')
+          .attr('disabled', 'true')
+          .append(initList[i].members[member].name)
+          .appendTo(controlBtnGroup);
+        var hpButton = $('<button>')
+          .attr('type', 'button')
+          .addClass('btn')
+          .addClass('btn-danger')
+          .attr('data-toggle', 'modal')
+          .attr('data-target', '#hpModal')
+          .attr('onclick', 'displayHpUpdate("'+initList[i].members[member].name+'", '+initList[i].members[member].hp+')')
+          .append(initList[i].members[member].hp)
+          .appendTo(controlBtnGroup);
+        var notesButton = $('<button>')
+          .attr('type', 'button')
+          .addClass('btn')
+          .addClass('btn-secondary')
+          .attr('data-toggle', 'modal')
+          .attr('data-target', '#notesModal')
+          .attr('onclick', 'displayNotesUpdate("'+initList[i].members[member].name+'", "'+initList[i].members[member].notes+'")')
+          .append('<i class="fas fa-sticky-note pr-1"></i>')
+          .append(initList[i].members[member].notes)
+          .appendTo(controlBtnGroup);
+      }
 
     }
 
-    var notesButton = $('<button>')
-      .attr('type', 'button')
-      .addClass('btn')
-      .addClass('btn-secondary')
-      .attr('data-toggle', 'modal')
-      .attr('data-target', '#notesModal')
-      .attr('onclick', 'displayNotesUpdate("'+initList[i].name+'", "'+initList[i].notes+'")')
-      .append('<i class="fas fa-sticky-note pr-1"></i>')
-      .append(initList[i].notes)
-      .appendTo(controllBtnGroup);
+
+
 
     var delButton = $('<button>')
       .attr('type', 'button')
@@ -225,28 +317,44 @@ function updateNpcTemplateList() {
       .addClass('border-bottom')
       .addClass('py-1');
     var nameCol = $('<div>')
-      .addClass('col')
+      .addClass('col-4')
       .addClass('no-border')
       .addClass('my-auto')
       .append(npcTemplateList[i].name)
       .appendTo(templateNpc);
     var hpCol = $('<div>')
-      .addClass('col-2')
+      .addClass('col-1')
       .addClass('no-border')
       .addClass('my-auto')
       .append(npcTemplateList[i].hp)
       .appendTo(templateNpc);
+
     var controlCol = $('<div>')
-      .addClass('col-4')
+      .addClass('input-group')
+      .addClass('col-6')
       .addClass('no-border')
       .appendTo(templateNpc);
+
+    var addNumber = $('<input>')
+      .attr('type', 'text')
+      .addClass('form-control')
+      .addClass('col-3')
+      .attr('id', npcTemplateList[i].name+'-templateQuantity')
+      .attr('value', 1)
+      .attr('size', 2)
+      .appendTo(controlCol);
+
+    var controlBtns = $('<div>')
+      .addClass('input-group-append')
+      .appendTo(controlCol);
+
     var addButton = $('<button>')
       .attr('type', 'button')
       .addClass('btn')
       .addClass('btn-success')
       .attr('onclick', 'addNpcFromTemplate("'+npcTemplateList[i].name+'", '+npcTemplateList[i].hp+')')
       .append('<i class="fas fa-plus"></i>')
-      .appendTo(controlCol);
+      .appendTo(controlBtns);
 
     var delButton = $('<button>')
       .attr('type', 'button')
@@ -482,7 +590,7 @@ function loadTestData() {
   addNpcTemplate('Bugbear', 60);
   addNpcTemplate('Giant', 85);
   addNpcTemplate('Dragon', 110);
-  addNpcTemplate('Big Dragon', 150);
+  addNpcTemplate('BigDragon', 150);
 
 }
 

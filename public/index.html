@@ -13,7 +13,7 @@
         <h1 class="display-4">
           <!--<img id='logo' src="images/logo_1.png" class="img-responsive" alt="Logo">-->
           DM's Whiteboard
-          <small>alpha</small>
+          <small class="text-muted">alpha</small>
         </h1>
         <p class="lead">Hopefully better than just writing shit down.</p>
         <button type="button" id="loadExamples" class="btn btn-primary" onClick="loadTestData()">Load Example Data</button>
@@ -52,16 +52,27 @@
       </div>
 
       <div class="row mb-3">
-        <div class="col-lg-9 border-right mb-3">
+        <div class="col-lg-8 border-right mb-3 px-1">
+          <div class="row border-bottom py-1 mx-1">
+            <div class="col">
+              <h3 class="text-center">Encounter</h3>
+            </div>
+          </div>
           <div class="container no-border" id="init-list">
           </div>
         </div>
-        <div class="col-lg-3 border-left mb-3">
+
+        <div class="col-lg-4 px-1">
+          <div class="row border-bottom py-1">
+            <div class="col">
+              <h3 class="text-center">Saved</h3>
+            </div>
+          </div>
           <div class="row">
               <div class="container no-border" id="template-list">
               </div>
           </div>
-          <div class="container no-border" class="row">
+          <div class="row container no-border">
           </div>
         </div>
       </div>
@@ -81,6 +92,7 @@
                 </div>
                 <input type="text" id="updateNpcHpHealText" class="form-control text-center" value="0">
               </div>
+
               <div class="input-group mx-auto col-7">
                 <div class="input-group-prepend">
                   <button type="button" id="updateNpcHpDamageBtn" class="btn btn-danger"><i class="fas fa-minus"></i></button>
