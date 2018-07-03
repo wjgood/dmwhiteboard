@@ -4,10 +4,11 @@ var socket = io(); //we'll use this later
 var initList = [];
 //var pcList = [];
 var npcTemplateList = [];
+var savedEncounterList = [];
 
 /////////////////////////// LOCAL STORAGE ////////////////////////
 if (localStorage.initList) {
-  console.log("Loading Local store");
+  console.log("Loading Local store: Init List");
   console.log(localStorage.initList);
   initList = JSON.parse(localStorage.initList);
   updateInitList();
@@ -17,7 +18,7 @@ else {
 }
 
 if (localStorage.npcTemplateList) {
-  console.log("Loading Local store");
+  console.log("Loading Local store: Template List");
   console.log(localStorage.npcTemplateList);
   npcTemplateList = JSON.parse(localStorage.npcTemplateList);
   updateNpcTemplateList();
@@ -26,6 +27,17 @@ else {
   localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
 }
 
+if (localStorage.savedEncounterList) {
+  console.log("Loading Local store: Saved Encounter List");
+  console.log(localStorage.savedEncounterList);
+  savedEncounterList = JSON.parse(localStorage.savedEncounterList);
+  updatesavedEncounterList();
+} else {
+  localStorage.savedEncounterList = JSON.stringify(savedEncounterList);
+}
+
+
+
 /////////////////////////// MODEL AND CRUD FUNCTIONS ////////////////////////
 function findPcIndex(name) {
   return initList.findIndex(obj => obj.name == name);
@@ -33,6 +45,10 @@ function findPcIndex(name) {
 
 function findNpcTemplateIndex(name) {
     return npcTemplateList.findIndex(obj => obj.name == name);
+}
+
+function findSavedEncounterIndex(name) {
+    return savedEncounterList.findIndex(obj => obj.name == name);
 }
 
 function addPc(name) {
@@ -121,6 +137,26 @@ function addNpcGroup(groupName, quantity, npcName, hp) {
 
 }
 
+function addSavedEncounter(encounterList, name) {
+  var newEncounter = {
+    name: name,
+    encounter: JSON.parse(JSON.stringify(encounterList))
+  };
+  savedEncounterList.push(newEncounter);
+  updatesavedEncounterList();
+}
+
+function loadSavedEncounter(name, overwrite) {
+  var encounter = savedEncounterList[findSavedEncounterIndex(name)].encounter;
+  if (overwrite) {
+    //issue warning before doing
+    initList = JSON.parse(JSON.stringify(encounter));
+  } else {
+    initList = initList.concat(JSON.parse(JSON.stringify(encounter)));
+  }
+  updateInitList();
+}
+
 function editPcInit(name, init) {
   initList[findPcIndex(name)].init = init;
   updateInitList();
@@ -157,6 +193,15 @@ function deletePC(name) {
 function deleteNpcTemplate(name) {
   npcTemplateList.splice(findNpcTemplateIndex(name),1);
   updateNpcTemplateList();
+}
+
+function clearEncounter() {
+
+}
+
+function deleteSavedEncounter(name) {
+  savedEncounterList.splice(findSavedEncounterIndex(name), 1);
+  updatesavedEncounterList();
 }
 
 
@@ -380,6 +425,50 @@ function updateNpcTemplateList() {
   localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
 }
 
+function updatesavedEncounterList() {
+  $('#scenario-list').empty();
+  for (var i = 0; i < savedEncounterList.length; i++) {
+    var encounter = $('<div>')
+      .addClass('row')
+      .addClass('border-bottom')
+      .addClass('py-1');
+    var nameCol = $('<div>')
+      .addClass('col-5')
+      .addClass('my-auto')
+      .append(savedEncounterList[i].name)
+      .appendTo(encounter);
+    var controlCol = $('<div>')
+      .addClass('btn-group')
+      .addClass('col-6')
+      .appendTo(encounter);
+
+    var insertBtn = $('<button>')
+      .attr('type', 'button')
+      .addClass('btn btn-success')
+      .attr('onclick', 'loadSavedEncounter("' + savedEncounterList[i].name + '", false)')
+      .append("Insert")
+      .appendTo(controlCol);
+    var overwriteBtn = $('<button>')
+      .attr('type', 'button')
+      .addClass('btn btn-outline-danger')
+      .attr('onclick', 'loadSavedEncounter("' + savedEncounterList[i].name + '", true)')
+      .append("Overwrite")
+      .appendTo(controlCol);
+
+    var delButton = $('<button>')
+      .attr('type', 'button')
+      .addClass('close')
+      .attr('onclick', 'deleteSavedEncounter("' + savedEncounterList[i].name + '")')
+      .append('&times;')
+      .appendTo(encounter);
+
+    encounter.appendTo($('#scenario-list'));
+  }
+
+  console.log("Saving to encounter list")
+  localStorage.savedEncounterList = JSON.stringify(savedEncounterList);
+}
+
 
 /////////////////////////// EVENT HANDLERS ////////////////////////
 $('#addPcName').keypress(function(event) {
@@ -508,6 +597,25 @@ $('#deleteNPCs').click(function() {
   }
 });
 
+$('#saveEncounterBtn').click(function() {
+  var name = $('#saveEncounterName').val();
+  if (name) {
+    addSavedEncounter(initList, name);
+    $('#saveEncounterName').val('');
+  } else {
+    var alert = $('<div>')
+      .addClass('row')
+      .addClass('alert')
+      .addClass('alert-warning')
+      .addClass('alert-dismissible')
+      .addClass('fade')
+      .addClass('show')
+      .attr('role', 'alert')
+      .append('Make sure your saved encounter has a name!')
+      .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+      .insertBefore($('#rowMainLists'));
+  }
+});
 
 /////////////////////////// HP UPDATE BOX ////////////////////////
 function displayHpUpdate(name, hp, groupName) {

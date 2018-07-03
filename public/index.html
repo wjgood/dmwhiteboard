@@ -51,11 +51,19 @@
         </div>
       </div>
 
-      <div class="row mb-3">
+      <div class="row mb-3" id="rowMainLists">
         <div class="col border-right mb-3 px-1">
           <div class="row border-bottom py-1 mx-1">
-            <div class="col">
+            <div class="col-6">
               <h3 class="text-center">Encounter</h3>
+            </div>
+            <div class="col-6">
+              <div class="input-group">
+                <input type="text" id="saveEncounterName" class="form-control" placeholder="Scenario Name" >
+                <div class="input-group-append">
+                  <button type="button" id="saveEncounterBtn" class="btn btn-primary">Save</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="container no-border" id="init-list">
@@ -72,7 +80,9 @@
               <div class="container no-border" id="template-list">
               </div>
           </div>
-          <div class="row container no-border">
+          <div class="row">
+              <div class="container no-border" id="scenario-list">
+              </div>
           </div>
         </div>
       </div>
