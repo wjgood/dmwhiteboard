@@ -37,11 +37,8 @@ if (localStorage.savedEncounterList) {
 
 
 
-/////////////////////////// MODEL AND CRUD FUNCTIONS ////////////////////////
-function findPcNpcIndex(name) {
-  return initList.findIndex(obj => obj.name == name);
-}
-
+/////////////////////////// CRUD FUNCTIONS ////////////////////////
+////// PC AND NPC FUNCTIONS //////
 function addPc(name) {
   var newPc = {
     type: "pc",
@@ -92,6 +89,10 @@ function addNpcGroup(groupName, quantity, npcName, hp) {
 
 }
 
+function findPcNpcIndex(name) {
+  return initList.findIndex(obj => obj.name == name);
+}
+
 function editPcNpcInit(name, init) {
   initList[findPcNpcIndex(name)].init = init;
   updateInitList();
@@ -125,11 +126,7 @@ function deletePcNpc(name) {
   updateInitList();
 }
 
-
-function findNpcTemplateIndex(name) {
-    return npcTemplateList.findIndex(obj => obj.name == name);
-}
-
+////// NPC TEMPLATE FUNCTIONS //////
 function addNpcTemplate(name, hp) {
   var newTemplate = {
     name: name,
@@ -137,6 +134,10 @@ function addNpcTemplate(name, hp) {
   }
   npcTemplateList.push(newTemplate);
   updateNpcTemplateList();
+}
+
+function findNpcTemplateIndex(name) {
+    return npcTemplateList.findIndex(obj => obj.name == name);
 }
 
 function addNpcFromTemplate(name, hp) {
@@ -171,11 +172,7 @@ function deleteNpcTemplate(name) {
   updateNpcTemplateList();
 }
 
-
-function findSavedEncounterIndex(name) {
-    return savedEncounterList.findIndex(obj => obj.name == name);
-}
-
+////// SAVED ENCOUNTER FUNCTIONS //////
 function addSavedEncounter(encounterList, name) {
   var newEncounter = {
     name: name,
@@ -183,6 +180,10 @@ function addSavedEncounter(encounterList, name) {
   };
   savedEncounterList.push(newEncounter);
   updatesavedEncounterList();
+}
+
+function findSavedEncounterIndex(name) {
+    return savedEncounterList.findIndex(obj => obj.name == name);
 }
 
 function loadSavedEncounter(name, overwrite) {
@@ -207,6 +208,7 @@ function deleteSavedEncounter(name) {
 
 
 /////////////////////////// VIEW LIST UPDATES ////////////////////////
+/* Comparse the inititives of two PCs/NPCs for use in sorting  */
 function initCompare(pcA, pcB) {
   return (pcB.init - pcA.init);
 }
@@ -617,6 +619,7 @@ $('#saveEncounterBtn').click(function() {
       .insertBefore($('#rowMainLists'));
   }
 });
+
 
 /////////////////////////// HP UPDATE BOX ////////////////////////
 function displayHpUpdate(name, hp, groupName) {
