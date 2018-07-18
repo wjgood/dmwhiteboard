@@ -10,7 +10,7 @@ var savedEncounterList = [];
 /  load it into the active memory. If not create it in storage   */
 if (localStorage.initList) {
   console.log("Loading Local store: Init List");
-  console.log(localStorage.initList);
+  //console.log(localStorage.initList);
   initList = JSON.parse(localStorage.initList);
   updateInitList();
 } else {
@@ -19,7 +19,7 @@ if (localStorage.initList) {
 
 if (localStorage.npcTemplateList) {
   console.log("Loading Local store: Template List");
-  console.log(localStorage.npcTemplateList);
+  //console.log(localStorage.npcTemplateList);
   npcTemplateList = JSON.parse(localStorage.npcTemplateList);
   updateNpcTemplateList();
 } else {
@@ -28,7 +28,7 @@ if (localStorage.npcTemplateList) {
 
 if (localStorage.savedEncounterList) {
   console.log("Loading Local store: Saved Encounter List");
-  console.log(localStorage.savedEncounterList);
+  //console.log(localStorage.savedEncounterList);
   savedEncounterList = JSON.parse(localStorage.savedEncounterList);
   updatesavedEncounterList();
 } else {
@@ -314,7 +314,7 @@ function updateInitList() {
     } else if (initList[i].type == "npcGroup") {
       initPlayer.addClass('bg-light');
       nameSpan.addClass('align-top');
-      console.log(initList[i].members);
+      //console.log(initList[i].members);
       for (var member in initList[i].members) {
         console.log(initList[i].members[member]);
         var controlBtnGroup = $('<div>')
@@ -361,8 +361,9 @@ function updateInitList() {
 
     initPlayer.appendTo('#init-list');
   }
-  console.log("Saving to Local store");
+  //console.log("Saving to Local store");
   localStorage.initList = JSON.stringify(initList);
+  serverLog(JSON.stringify(initList));
 }
 
 function updateNpcTemplateList() {
@@ -422,8 +423,9 @@ function updateNpcTemplateList() {
     templateNpc.appendTo($('#template-list'));
   }
 
-  console.log("Saving to Local store");
+   //console.log("Saving to Local store");
   localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
+  serverLog( JSON.stringify(npcTemplateList));
 }
 
 function updatesavedEncounterList() {
@@ -466,8 +468,9 @@ function updatesavedEncounterList() {
     encounter.appendTo($('#scenario-list'));
   }
 
-  console.log("Saving to encounter list")
+  //console.log("Saving to encounter list")
   localStorage.savedEncounterList = JSON.stringify(savedEncounterList);
+  serverLog(JSON.stringify(savedEncounterList));
 }
 
 
@@ -674,6 +677,18 @@ function notesUpdateFromModal() {
 }
 
 
+/////////////////////////// SERVER COMMS ////////////////////////
+socket.on('connect', function() {
+  //socket.emit('test','hi');
+});
+
+socket.on('test', function(message) {
+  console.log("Message from server: " + message);
+});
+
+function serverLog(message) {
+  socket.emit('log', message);
+}
 
 
 /////////////////////////// TEST DATA ////////////////////////
