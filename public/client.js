@@ -208,7 +208,7 @@ function deleteSavedEncounter(name) {
 
 
 /////////////////////////// VIEW LIST UPDATES ////////////////////////
-/* Comparse the inititives of two PCs/NPCs for use in sorting  */
+/* Compares the inititives of two PCs/NPCs for use in sorting  */
 function initCompare(pcA, pcB) {
   return (pcB.init - pcA.init);
 }
@@ -365,7 +365,8 @@ function updateInitList() {
   }
   //console.log("Saving to Local store");
   localStorage.initList = JSON.stringify(initList);
-  serverLog(JSON.stringify(initList));
+  //serverLog(JSON.stringify(initList));
+  logEnvironmentVeriables();
 }
 
 function updateNpcTemplateList() {
@@ -427,7 +428,8 @@ function updateNpcTemplateList() {
 
    //console.log("Saving to Local store");
   localStorage.npcTemplateList = JSON.stringify(npcTemplateList);
-  serverLog( JSON.stringify(npcTemplateList));
+  //serverLog( JSON.stringify(npcTemplateList));
+  logEnvironmentVeriables();
 }
 
 function updatesavedEncounterList() {
@@ -472,7 +474,8 @@ function updatesavedEncounterList() {
 
   //console.log("Saving to encounter list")
   localStorage.savedEncounterList = JSON.stringify(savedEncounterList);
-  serverLog(JSON.stringify(savedEncounterList));
+   //serverLog(JSON.stringify(savedEncounterList));
+  logEnvironmentVeriables();
 }
 
 
@@ -542,7 +545,7 @@ $('#addNpc').click(function() {
 });
 
 function tryAddNPC(name, hp) {
-  if (name && hp)
+  if (name && hp && !isNaN(hp) && (findPcNpcIndex(name) < 0))
   {
     addNpc(name, hp);
     $('#addNpcName').val('');
@@ -568,7 +571,7 @@ function tryAddNPC(name, hp) {
 $('#addNpcTemplate').click(function() {
     var name = $('#addNpcName').val();
     var hp = $('#addNpcHp').val();
-    if (name && hp)
+    if (name && hp && (findNpcTemplateIndex(name) < 0))
     {
       addNpcTemplate(name, hp);
       $('#addNpcName').val('');
@@ -584,7 +587,7 @@ $('#addNpcTemplate').click(function() {
         .addClass('fade')
         .addClass('show')
         .attr('role', 'alert')
-        .append('Make sure your NPC has both a name and HP!')
+        .append("Make sure your NPC's name is unique and HP isn't blank!")
         .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
         .insertBefore($('#rowAddNPC'));
 
@@ -625,10 +628,12 @@ $('#saveEncounterBtn').click(function() {
 
 
 /////////////////////////// HP UPDATE BOX ////////////////////////
+var hpUndo;
 function displayHpUpdate(name, hp, groupName) {
   $('#updateNpcName').val(name);
   $('#updateNpcGroupName').val(groupName);
   $('#updateNpcHp').val(hp);
+  hpUndo = hp;
   $('#updateNpcHpHealText').val(0);
   $('#updateNpcHpDamageText').val(0);
   $('#updateNpcHpSubmit').attr('onclick', 'hpUpdateFromModal()');
@@ -639,13 +644,19 @@ $('#updateNpcHpHealBtn').click(function() {
   var healing = Number($('#updateNpcHpHealText').val());
   $('#updateNpcHp').val(hp+1);
   $('#updateNpcHpHealText').val(healing+1);
+  hpUndo = $('#updateNpcHp').val();
 });
 
 $('#updateNpcHpHealText').change(function() {
-  console.log("test");
-  var healing = Number($('#updateNpcHpHealText').val());
-  var hp =  Number($('#updateNpcHp').val());
-  $('#updateNpcHp').val(hp+healing);
+  if (isNaN($('#updateNpcHpHealText').val())) {
+    $('#updateNpcHpHealText').val(0);
+  }
+  else {
+    var healing = Number($('#updateNpcHpHealText').val());
+    var hp =  Number($('#updateNpcHp').val());
+    $('#updateNpcHp').val(hp+healing);
+    hpUndo = $('#updateNpcHp').val();
+  }
 });
 
 $('#updateNpcHpDamageBtn').click(function() {
@@ -653,13 +664,28 @@ $('#updateNpcHpDamageBtn').click(function() {
   var damage = Number($('#updateNpcHpDamageText').val());
   $('#updateNpcHp').val(hp-1);
   $('#updateNpcHpDamageText').val(damage+1);
+  hpUndo = $('#updateNpcHp').val();
 });
 
 $('#updateNpcHpDamageText').change(function() {
-  var damage = Number($('#updateNpcHpDamageText').val());
-  var hp =  Number($('#updateNpcHp').val());
-  $('#updateNpcHp').val(hp-damage);
+  if (isNaN($('#updateNpcHpDamageText').val())) {
+    $('#updateNpcHpDamageText').val(0);
+  }
+  else {
+    var damage = Number($('#updateNpcHpDamageText').val());
+    var hp =  Number($('#updateNpcHp').val());
+    $('#updateNpcHp').val(hp-damage);
+    hpUndo = $('#updateNpcHp').val();
+  }
+});
 
+$('#updateNpcHp').change(function() {
+  if (isNaN($('#updateNpcHp').val())) {
+    $('#updateNpcHp').val(hpUndo);
+  }
+  else {
+    hpUndo = $('#updateNpcHp').val();
+  }
 });
 
 function hpUpdateFromModal() {
@@ -693,6 +719,20 @@ function serverLog(message) {
   socket.emit('log', message);
 }
 
+var count = 0;
+function logEnvironmentVeriables() {
+  if (count < 5) count++;
+  else {
+    var environment = {
+      initList: initList,
+      encounterList: savedEncounterList,
+      templateList: npcTemplateList
+    };
+    socket.emit('log', environment);
+    count = 0;
+  }
+
+}
 
 /////////////////////////// TEST DATA ////////////////////////
 function loadTestData() {

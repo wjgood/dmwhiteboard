@@ -46,6 +46,8 @@ io.on('connection', function(socket) {
     console.log(message);
     currentLog.push({user: name, log: message});
   });
+
+  
 });
 
 
