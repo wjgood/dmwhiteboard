@@ -771,7 +771,7 @@ function serverLog(message) {
 
 var count = 0;
 function logEnvironmentVeriables() {
-  if (count < 5) count++;
+  if (count < 2) count++;
   else {
     var environment = {
       initList: initList,
