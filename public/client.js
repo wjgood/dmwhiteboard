@@ -36,7 +36,6 @@ if (localStorage.savedEncounterList) {
 }
 
 
-
 /////////////////////////// CRUD FUNCTIONS ////////////////////////
 ////// PC AND NPC FUNCTIONS //////
 function addPc(name) {
@@ -142,18 +141,26 @@ function findNpcTemplateIndex(name) {
 
 function addNpcFromTemplate(name, hp) {
   var quantity = Number($('#'+name+'-templateQuantity').val());
-  if (quantity == 1) {
+  if (isNaN(quantity))
+  {
+    $('#'+name+'-templateQuantity').val(1);
+  }
+  else if (quantity == 1)
+  {
     var count = 1;
     while (count) {
       var newName = name + count.toString();
-      if (findPcNpcIndex(newName) == -1) {
+      if (findPcNpcIndex(newName) == -1)
+      {
         addNpc(newName, hp);
         count = 0;
       } else {
         count++;
       }
     }
-  } else {
+  }
+  else
+  {
     var count = 1;
     while (count) {
       var groupName = name + 'Group' + count.toString();
@@ -174,12 +181,26 @@ function deleteNpcTemplate(name) {
 
 ////// SAVED ENCOUNTER FUNCTIONS //////
 function addSavedEncounter(encounterList, name) {
-  var newEncounter = {
-    name: name,
-    encounter: JSON.parse(JSON.stringify(encounterList))
-  };
-  savedEncounterList.push(newEncounter);
-  updatesavedEncounterList();
+  if (findSavedEncounterIndex(name) > -1) {
+    var alert = $('<div>')
+      .addClass('row')
+      .addClass('alert')
+      .addClass('alert-warning')
+      .addClass('alert-dismissible')
+      .addClass('fade')
+      .addClass('show')
+      .attr('role', 'alert')
+      .append('There is already a saved encounter with that name.')
+      .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+      .insertBefore($('#saveEncounterName'));
+  } else {
+    var newEncounter = {
+      name: name,
+      encounter: JSON.parse(JSON.stringify(encounterList))
+    };
+    savedEncounterList.push(newEncounter);
+    updatesavedEncounterList();
+  }
 }
 
 function findSavedEncounterIndex(name) {
@@ -192,7 +213,36 @@ function loadSavedEncounter(name, overwrite) {
     //issue warning before doing
     initList = JSON.parse(JSON.stringify(encounter));
   } else {
-    initList = initList.concat(JSON.parse(JSON.stringify(encounter)));
+    //console.log(encounter);
+
+    var noProblem = true;
+    for (var i = 0; i < encounter.length; i++) {
+      //console.log(encounter[i]);
+      if (findPcNpcIndex(encounter[i].name) >= 0)
+      {
+        noProblem = false;
+      }
+    }
+
+    if (noProblem)
+    {
+      //Don't ask why I'm stringifying and then parsing this. It just works better. ¯\_(ツ)_/¯
+      initList = initList.concat(JSON.parse(JSON.stringify(encounter)));
+    } else {
+      //error
+      var alert = $('<div>')
+        .addClass('row')
+        .addClass('alert')
+        .addClass('alert-warning')
+        .addClass('alert-dismissible')
+        .addClass('fade')
+        .addClass('show')
+        .attr('role', 'alert')
+        .append('That encounter includes a PC or NPC that is already in the current encounter.')
+        .append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>')
+        .prependTo($('#scenario-list'));
+    }
+
   }
   updateInitList();
 }
@@ -318,7 +368,7 @@ function updateInitList() {
       nameSpan.addClass('align-top');
       //console.log(initList[i].members);
       for (var member in initList[i].members) {
-        console.log(initList[i].members[member]);
+        //console.log(initList[i].members[member]);
         var controlBtnGroup = $('<div>')
           .addClass('btn-group')
           .addClass('float-left')
