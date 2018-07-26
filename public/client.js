@@ -1,4 +1,5 @@
 var socket = io(); //we'll use this later
+//As the project expands, this should be broken into modules and the server should do more work.
 
 /////////////////////////// DATA INITIALIZATION ////////////////////////
 var initList = [];
